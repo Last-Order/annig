@@ -62,10 +62,7 @@ class MusicBrainzApi {
                 }
                 parsedTracks.push({
                     title: trackTitle,
-                    artist:
-                        artist === "[dialogue]"
-                            ? escapeArtist(albumArtist)
-                            : artist,
+                    artist: artist === "[dialogue]" ? albumArtist : artist,
                     type,
                 });
             }
