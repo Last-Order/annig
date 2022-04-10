@@ -17,7 +17,7 @@ export const parseArtistCredit = async (artistCredits, releaseDate) => {
         (artist) => artist.type === "Character"
     );
     let result = [];
-    parsedArtists.forEach((artist, index) => {
+    for (const artist of parsedArtists) {
         if (artist.type === "Group") {
             result.push({
                 id: artist.id,
@@ -37,7 +37,17 @@ export const parseArtistCredit = async (artistCredits, releaseDate) => {
                 correspondingPersonName = correspondingPerson.name;
                 characterPersonMap.set(artist.name, correspondingPersonName);
             } else {
-                throw new Error(`No corresponding person for ${artist.name}`);
+                console.log(
+                    `Missing corresponding person for ${artist.name}, getting from MusicBrainz...`
+                );
+                const person = await MusicBrainz.getVoiceActorForCharacter(
+                    artist.id
+                );
+                console.log(
+                    `Got corresponding person for ${artist.name}: ${person.name}`
+                );
+                correspondingPersonName = person.name;
+                characterPersonMap.set(artist.name, correspondingPersonName);
             }
             result[result.length - 1]?.children
                 ? result[result.length - 1].children.push({
@@ -76,7 +86,7 @@ export const parseArtistCredit = async (artistCredits, releaseDate) => {
                       name: escapeArtist(artist.name),
                   });
         }
-    });
+    }
     const noMemberGroups = result.filter((i) => i.children?.length === 0);
     if (noMemberGroups.length > 0) {
         for (const group of noMemberGroups) {
