@@ -47,7 +47,7 @@ class MusicBrainzApi {
                 );
                 let type = "normal";
                 if (
-                    ["off vocal", "instrumental"].some((type) =>
+                    ["off vocal", "instrumental", "カラオケ"].some((type) =>
                         trackTitle.toLowerCase().includes(type)
                     )
                 ) {
