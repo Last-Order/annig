@@ -10,13 +10,22 @@ export const escapeFilename = (filename) => {
         "<": "＜",
         ">": "＞",
         "?": "？",
+        "/": "／",
+        "〜": "～",
     };
     for (const key of Object.keys(maps)) {
-        escapedFilename = filename.replace(new RegExp(`\\${key}`, "g"), maps[key]);
+        escapedFilename = escapedFilename.replace(
+            new RegExp(`\\${key}`, "g"),
+            maps[key]
+        );
     }
     return escapedFilename;
 };
 
 export const escapeArtist = (artist) => {
     return artist.replaceAll("、", "、、");
+};
+
+export const escapeTrackName = (trackName) => {
+    return trackName.replaceAll("〜", "～");
 };

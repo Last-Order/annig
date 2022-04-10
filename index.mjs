@@ -5,7 +5,7 @@ import * as crypto from "crypto";
 import erii from "erii";
 import { fileURLToPath } from "url";
 import MusicBrainz from "./api/musicbrainz.mjs";
-import { escapeFilename } from "./utils/common.mjs";
+import { escapeFilename, escapeTrackName } from "./utils/common.mjs";
 import { parseCatalog } from "./utils/catalog.mjs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -77,7 +77,7 @@ catalog = "${parsedCatalog[index]}"
 ${disc.tracks
     .map(
         (track) => `[[discs.tracks]]
-title = "${track.title}"${
+title = "${escapeFilename(track.title)}"${
             track.artist !== albumArtist ? `\nartist = "${track.artist}"` : ""
         }${track.type !== "normal" ? `\ntype = "${track.type}"` : ""}
 `
