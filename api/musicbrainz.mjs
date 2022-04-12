@@ -15,13 +15,12 @@ class MusicBrainzApi {
         const albumData = await axios.get(API).then((res) => res.data);
         await sleep(1500);
         const title = albumData.title;
-        // const catalog = albumData["label-info"]?.[0]?.["catalog-number"];
+        const catalog = albumData["label-info"]?.[0]?.["catalog-number"];
         // const parsedCatalog = parseCatalog(catalog);
-        // console.log(parsedCatalog);
         const releaseDate = albumData.date;
         const albumArtistCredit = albumData["artist-credit"];
         const edition = albumData.disambiguation;
-        console.log(`Title: ${title}, Release Date: ${releaseDate}`);
+        console.log(`Title: ${title}, Release Date: ${releaseDate}, Catalog: ${catalog}, Edition: ${edition}`);
         const albumArtist = await parseArtistCredit(
             albumArtistCredit,
             releaseDate
@@ -72,7 +71,7 @@ class MusicBrainzApi {
         }
         return {
             title,
-            // catalog,
+            catalog,
             releaseDate,
             albumArtist,
             edition,

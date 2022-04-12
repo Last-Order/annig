@@ -38,14 +38,8 @@ Erii.bind(
         const matchResult = directoryName.match(
             /^\[(?<Year>\d{4}|\d{2})-?(?<Month>\d{2})-?(?<Day>\d{2})]\[(?<Catalog>[^\]]+)] (.+?)(?: \[(\d+) Discs])?$/
         );
-        if (!matchResult?.groups?.Catalog) {
-            throw new Error(
-                "Please execute this command in the album directories."
-            );
-        }
-        const catalogFromDirectoryName = matchResult.groups.Catalog;
-        const parsedCatalog = parseCatalog(catalogFromDirectoryName);
-        if (!releaseId || releaseId === "true") {
+        const catalogFromDirectoryName = matchResult?.groups?.Catalog;
+        if (catalogFromDirectoryName) {
             console.log(
                 `Search from MusicBrainz for catalog: ${catalogFromDirectoryName}...`
             );
@@ -56,17 +50,23 @@ Erii.bind(
             console.log(`Got release id: ${resultId}, title: ${resultTitle}`);
             releaseId = resultId;
         }
+        if (!releaseId) {
+            throw new Error(
+                "Please execute this command in the album directories or provide mbid."
+            );
+        }
         console.log("Getting release info from MusicBrainz...");
-        const { title, releaseDate, albumArtist, edition, discs } =
+        const { title, releaseDate, albumArtist, edition, discs, catalog } =
             await MusicBrainz.getReleaseInfo(releaseId);
-        // TODO: Multi disc catalog
+        const catalogForUse = catalog || catalogFromDirectoryName;
+        const parsedCatalog = parseCatalog(catalogForUse);
         const result = `[album]
 album_id = "${crypto.randomUUID()}"
 title = "${escapeFilename(title)}"
 artist = "${albumArtist}"
 date = ${releaseDate}
 type = "normal"${edition ? `\nedition = "${edition}"` : ""}
-catalog = "${catalogFromDirectoryName}"
+catalog = "${catalogForUse}"
 tags = []
 
 ${discs
@@ -87,7 +87,7 @@ title = "${escapeFilename(track.title)}"${
     .join("\n")}`;
         const outputPath = path.resolve(
             process.env.ANNI_REPO,
-            `./album/${catalogFromDirectoryName}.toml`
+            `./album/${catalogForUse}.toml`
         );
         fs.writeFileSync(outputPath, result);
         console.log(`TOML file generated at ${outputPath}`);
