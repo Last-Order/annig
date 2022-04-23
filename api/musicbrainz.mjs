@@ -143,9 +143,7 @@ class MusicBrainzApi {
             (relation) => relation["type-id"] === RelationTypes.VoiceActor
         );
         if (memberRelations.length === 0) {
-            throw new Error(
-                `No voice actor found for character ${characterId}`
-            );
+            return null;
         }
         return {
             id: memberRelations[0].artist.id,

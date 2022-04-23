@@ -43,25 +43,36 @@ export const parseArtistCredit = async (artistCredits, releaseDate) => {
                 const person = await MusicBrainz.getVoiceActorForCharacter(
                     artist.id
                 );
-                console.log(
-                    `Got corresponding person for ${artist.name}: ${person.name}`
-                );
-                correspondingPersonName = person.name;
-                characterPersonMap.set(artist.name, correspondingPersonName);
+                if (person) {
+                    console.log(
+                        `Got corresponding person for ${artist.name}: ${person.name}`
+                    );
+                    correspondingPersonName = person.name;
+                    characterPersonMap.set(
+                        artist.name,
+                        correspondingPersonName
+                    );
+                } else {
+                    console.log(`No corresponding person for ${artist.name}`);
+                }
             }
-            result[result.length - 1]?.children
-                ? result[result.length - 1].children.push({
-                      id: artist.id,
-                      name: `${escapeArtist(artist.name)}（${escapeArtist(
-                          correspondingPersonName
-                      )}）`,
-                  })
-                : result.push({
-                      id: artist.id,
-                      name: `${escapeArtist(artist.name)}（${escapeArtist(
-                          correspondingPersonName
-                      )}）`,
-                  });
+            const pushTarget = result[result.length - 1]?.children
+                ? result[result.length - 1].children
+                : result;
+            if (correspondingPersonName) {
+                pushTarget.push({
+                    id: artist.id,
+                    name: `${escapeArtist(artist.name)}（${escapeArtist(
+                        correspondingPersonName
+                    )}）`,
+                });
+            } else {
+                pushTarget.push({
+                    id: artist.id,
+                    name: `${escapeArtist(artist.name)}`,
+                });
+            }
+
             if (persons[charaIndex]) {
                 persons[charaIndex].used = true;
             }
@@ -124,13 +135,22 @@ export const parseArtistCredit = async (artistCredits, releaseDate) => {
                                 await MusicBrainz.getVoiceActorForCharacter(
                                     character.id
                                 );
-                            console.log(
-                                `Got corresponding person for ${character.name}: ${person.name}`
-                            );
-                            characterPersonMap.set(character.name, person.name);
-                            character.name = `${escapeArtist(
-                                character.name
-                            )}（${escapeArtist(person.name)}）`;
+                            if (person) {
+                                console.log(
+                                    `Got corresponding person for ${character.name}: ${person.name}`
+                                );
+                                characterPersonMap.set(
+                                    character.name,
+                                    person.name
+                                );
+                                character.name = `${escapeArtist(
+                                    character.name
+                                )}（${escapeArtist(person.name)}）`;
+                            } else {
+                                console.log(
+                                    `No corresponding person for ${character.name}`
+                                );
+                            }
                         }
                     }
                 }

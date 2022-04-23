@@ -39,7 +39,7 @@ Erii.bind(
             /^\[(?<Year>\d{4}|\d{2})-?(?<Month>\d{2})-?(?<Day>\d{2})]\[(?<Catalog>[^\]]+)] (.+?)(?: \[(\d+) Discs])?$/
         );
         const catalogFromDirectoryName = matchResult?.groups?.Catalog;
-        if (catalogFromDirectoryName) {
+        if (catalogFromDirectoryName && releaseId === "true") {
             console.log(
                 `Search from MusicBrainz for catalog: ${catalogFromDirectoryName}...`
             );
