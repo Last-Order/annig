@@ -39,13 +39,18 @@ Erii.bind(
             /^\[(?<Year>\d{4}|\d{2})-?(?<Month>\d{2})-?(?<Day>\d{2})]\[(?<Catalog>[^\]]+)] (.+?)(?: \[(\d+) Discs])?$/
         );
         const catalogFromDirectoryName = matchResult?.groups?.Catalog;
-        if (catalogFromDirectoryName && releaseId === "true") {
+        if (
+            (catalogFromDirectoryName || options.catalog) &&
+            releaseId === "true"
+        ) {
             console.log(
-                `Search from MusicBrainz for catalog: ${catalogFromDirectoryName}...`
+                `Search from MusicBrainz for catalog: ${
+                    options.catalog || catalogFromDirectoryName
+                }...`
             );
             const { id: resultId, title: resultTitle } =
                 await MusicBrainz.getReleaseIdByCatalog(
-                    catalogFromDirectoryName
+                    options.catalog || catalogFromDirectoryName
                 );
             console.log(`Got release id: ${resultId}, title: ${resultTitle}`);
             releaseId = resultId;
@@ -85,6 +90,10 @@ title = "${escapeFilename(track.title)}"${
     .join("\n")}`
     )
     .join("\n")}`;
+        if (options.dryRun) {
+            console.log(result);
+            return;
+        }
         const outputPath = path.resolve(
             process.env.ANNI_REPO,
             `./album/${catalogForUse}.toml`
@@ -93,6 +102,18 @@ title = "${escapeFilename(track.title)}"${
         console.log(`TOML file generated at ${outputPath}`);
     }
 );
+
+Erii.addOption({
+    name: ["catalog", "c"],
+    command: "get",
+    description: "Search by catalog",
+});
+
+Erii.addOption({
+    name: ["dry-run"],
+    command: "get",
+    description: "Print result only",
+});
 
 Erii.default(() => {
     Erii.showHelp();
